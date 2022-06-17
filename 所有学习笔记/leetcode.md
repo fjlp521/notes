@@ -3605,3 +3605,67 @@ func isDigit(s string) (bool, int) {
 }
 ```
 
+##### [leetcode 54：螺旋矩阵](https://leetcode.cn/problems/spiral-matrix/)
+
+```go
+func spiralOrder(matrix [][]int) []int {
+    m, n := len(matrix), len(matrix[0])
+	s := m*n
+    ans := make([]int, s)
+	k := 0			//记录已遍历数目
+	i, j := 0, -1	//起始位置，j = -1 是为了使得循环统一
+    //在该循环中，m、n 表示剩余未遍历的行数、列数，其值是动态变化的；同时要时刻监视 k < s ，随时退出循环
+	for k < s {
+        //向左，之后行数少一
+		for ii := 0; k < s && ii < n; ii++ {
+			j++
+			ans[k] = matrix[i][j]
+			k++
+		} 
+		m--
+        //向下，之后列数少一
+		for ii := 0; k < s && ii < m; ii++ {
+			i++
+			ans[k] = matrix[i][j]
+			k++
+		} 
+		n--
+        //向左，之后行数少一
+		for ii := 0; k < s && ii < n; ii++ {
+			j--
+			ans[k] = matrix[i][j]
+			k++
+		} 
+		m--
+        //向右，之后列数少一
+		for ii := 0; k < s && ii < m; ii++ {
+			i--
+			ans[k] = matrix[i][j]
+			k++
+		} 
+		n--
+	}
+	return ans
+}
+```
+
+##### [leetcode 116：填充每个节点的下一个右侧节点指针](https://leetcode.cn/problems/populating-next-right-pointers-in-each-node/)
+
+```go
+//注意利用条件，这是满二叉树
+func connect(root *Node) *Node {
+    if root == nil { return nil }
+    //左孩子的 Next 为右孩子
+	if root.Left != nil {
+        root.Left.Next = root.Right
+    }
+    //右孩子的 Next 为其父节点的 Next 的左孩子
+    if root.Right != nil && root.Next != nil {
+        root.Right.Next = root.Next.Left
+    }
+    connect(root.Left)
+    connect(root.Right)
+    return root
+}
+```
+

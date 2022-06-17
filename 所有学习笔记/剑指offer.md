@@ -1264,7 +1264,7 @@ func levelOrder(root *TreeNode) []int {
 
 ###### 题目二：分行从上到下打印二叉树
 
-题解：用一个变量记录当前层未打印的节点数，用另一个变量记录下层节点数
+题解一：用一个变量记录当前层未打印的节点数，用另一个变量记录下层节点数
 
 ```go
 func levelOrder(root *TreeNode) [][]int {
@@ -1294,6 +1294,34 @@ func levelOrder(root *TreeNode) [][]int {
         }
     }
     return res
+}
+```
+
+题解二：无需变量记录，依据 len(queue) 可完成分层 
+
+```go
+func levelOrder(root *TreeNode) [][]int {
+    if root == nil { return  nil }
+    queue := []*TreeNode{root}
+    ans := [][]int{}
+    for len(queue) > 0 {
+        level := []int{}
+        //该循环完成当前层的遍历，同时将下一层节点全部添加到 queue 中
+        for i := 0; i < len(queue); i++ {
+        //for _ = range queue {			也可以这样写
+            p := queue[0]
+            queue = queue[1:]
+            level = append(level, p.Val)
+            if p.Left != nil {
+                queue = append(queue, p.Left)
+            }
+            if p.Right != nil {
+                queue = append(queue, p.Right)
+            }
+        }
+        ans = append(ans, level)
+    }
+    return ans
 }
 ```
 
