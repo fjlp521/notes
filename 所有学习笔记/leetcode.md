@@ -3669,3 +3669,99 @@ func connect(root *Node) *Node {
 }
 ```
 
+#### [leetcode 130：被围绕的区域](https://leetcode.cn/problems/surrounded-regions/)
+
+题解一：思路正确，但代码写有点烂
+
+```go
+func solve(board [][]byte) {
+	m, n := len(board), len(board[0])
+	visited := make([][]bool, m)
+	for i := 0; i < m; i++ {
+		visited[i] = make([]bool, n)
+	}
+	//从边上的O出发往里面探
+	var dfs func(int, int)
+	dfs = func(i, j int) {
+		visited[i][j] = true
+		if i-1 >= 0 && board[i-1][j] == 'O' && !visited[i-1][j] {
+			dfs(i-1, j)
+		}
+		if i+1 < m && board[i+1][j] == 'O' && !visited[i+1][j] {
+			dfs(i+1, j)
+		}
+		if j-1 >= 0 && board[i][j-1] == 'O' && !visited[i][j-1] {
+			dfs(i, j-1)
+		}
+		if j+1 < n && board[i][j+1] == 'O' && !visited[i][j+1] {
+			dfs(i, j+1)
+		}
+	}
+	//第一行和最后一行
+	for i := 0; i < n; i++ {
+		if board[0][i] == 'O' && !visited[0][i] {
+			dfs(0, i)
+		}
+		if board[m-1][i] == 'O' && !visited[m-1][i] {
+			dfs(m-1, i)
+		}
+	}
+	//第一列和最后一列
+	for i := 0; i < m; i++ {
+		if board[i][0] == 'O' && !visited[i][0] {
+			dfs(i, 0)
+		}
+		if board[i][n-1] == 'O' && !visited[i][n-1] {
+			dfs(i, n-1)
+		}
+	}
+	//将矩阵中未经访问且为O的置为X
+	for i := 0; i < m; i++ {
+		for j := 0; j < n; j++ {
+			if board[i][j] == 'O' && !visited[i][j] {
+				board[i][j] = 'X'
+			}
+		}
+	}
+}
+```
+
+题解二：优化后的代码，优化一：省去额外的标记数组，直接修改原数组进行标记；优化二：繁琐的 if 判断
+
+```go
+func solve(board [][]byte) {
+	m, n := len(board), len(board[0])
+	//从边上的O出发往里面探
+	var dfs func(int, int)
+	dfs = func(i, j int) {
+		if i < 0 || i >= m || j < 0 || j >= n || board[i][j] != 'O' { return }
+		board[i][j] = 'A'		//将与边界相连的置为 A
+		dfs(i-1, j)
+		dfs(i+1, j)
+		dfs(i, j-1)
+		dfs(i, j+1)
+	}
+	//第一行和最后一行
+	for i := 0; i < n; i++ {
+		dfs(0, i)
+		dfs(m-1, i)
+	}
+	//第一列和最后一列
+	for i := 0; i < m; i++ {
+		dfs(i, 0)
+		dfs(i, n-1)
+	}
+	//将矩阵中未经访问且为O的置为X
+	for i := 0; i < m; i++ {
+		for j := 0; j < n; j++ {
+			if board[i][j] == 'O' {		//不与边界相连的 O，置为 X
+				board[i][j] = 'X'
+			}else if board[i][j] == 'A' {	//与边界相连的 O，恢复为 O
+				board[i][j] = 'O'
+			}
+		}
+	}
+}
+```
+
+**注意：这里的优化二反而使得效率降低，之前的虽然 if 判断比较繁琐，但有效避免了递归函数调用与返回的过程，切～**
