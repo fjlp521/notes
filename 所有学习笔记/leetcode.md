@@ -3765,3 +3765,32 @@ func solve(board [][]byte) {
 ```
 
 **注意：这里的优化二反而使得效率降低，之前的虽然 if 判断比较繁琐，但有效避免了递归函数调用与返回的过程，切～**
+
+##### [leetcode 1143：最长公共子序列](https://leetcode.cn/problems/longest-common-subsequence/)
+
+> 原问题：求 X<sub>m</sub> 和 Y<sub>n</sub> ，子问题：求 X<sub>i</sub> 和 Y<sub>j</sub> ，（1 <= i <= m，1 <= j <= n） 
+
+```go
+//分两种情况
+//1、X(m) == Y(n)，则需求出 (Xm-1, Yn-1) + 1 （最后再加上X(m)或Y(n)）
+//2、X(m) != Y(n)，则需求出 MAX((Xm-1, Yn), (Xm, Yn-1))
+func longestCommonSubsequence(text1 string, text2 string) int {
+    m, n := len(text1), len(text2)
+    //这里默认了dp第一行和第一列为0，当成哨兵用
+    dp := make([][]int, m+1)
+    for i := 0; i < m+1; i++ {
+        dp[i] = make([]int, n+1)
+    }
+    for i := 0; i < m; i++ {
+        for j := 0; j < n; j++ {
+            if text1[i] == text2[j] {
+                dp[i+1][j+1] = dp[i][j] + 1
+            }else {
+                dp[i+1][j+1] = max(dp[i][j+1], dp[i+1][j])
+            }
+        }
+    }
+    return dp[m][n]
+}
+```
+
